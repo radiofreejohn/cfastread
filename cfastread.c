@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
             }
 
             frankenstring = malloc(sizeof(char) * (strlen(p)+strlen(savedstring)) + 1);
-            strlcat(frankenstring, savedstring, strlen(savedstring));
-            strlcat(frankenstring, p, strlen(p));
+            strncat(frankenstring, savedstring, strlen(savedstring));
+            strncat(frankenstring, p, strlen(p));
             p = frankenstring;
         }
 
