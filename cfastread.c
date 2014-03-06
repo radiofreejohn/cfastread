@@ -62,14 +62,18 @@ int main(int argc, char *argv[]) {
     char *last;
 
     // check file
-    status = stat(argv[1], &st_buf);
-    if (status != 0 || (!S_ISREG(st_buf.st_mode))) {
-        fprintf(stderr, "Error or file not found: %s\n", argv[1]);
-        return 1;
+    if (argc == 2) {
+        status = stat(argv[1], &st_buf);
+        if (status != 0 || (!S_ISREG(st_buf.st_mode))) {
+            fprintf(stderr, "Error or file not found: %s\n", argv[1]);
+            return 1;
+        }
+        f = fopen(argv[1], "r");
+    } else {
+        f = stdin;
     }
 
-    // open the file
-    f = fopen(argv[1], "r");
+        // open the file
     if (f == NULL) {
         fprintf(stderr, "Error opening file: %s\n", argv[1]);
         return 1;
@@ -90,22 +94,16 @@ int main(int argc, char *argv[]) {
             strlcat(frankenstring, savedstring, strlen(savedstring));
             strlcat(frankenstring, p, strlen(p));
             p = frankenstring;
-            //n_spaces = spaces(strlen(frankenstring), OFFSET);
-            //printf("%*s%s\n", n_spaces, "",frankenstring);
         }
 
         do {
-            //printf("\x1b[25A");
-            // back cursor up
-//            puts("\x1b[80D");
-            // clear line
+            // I actually don't know why these don't work if both are
+            // puts or printf or they are swapped... shrug.
             printf("\x1b[0K");
             puts("\x1b[1A");
             if (save_last == 1) {
                 last = p;
             }
-            // n_spaces = spaces(strlen(p), OFFSET);
-            // printf("%*s%s", n_spaces,"", p);
             printstring(p);
             usleep((60.0/WPM) * 1000 * 1000);
         } while ((p = strtok(NULL, delims)));
@@ -119,7 +117,7 @@ int main(int argc, char *argv[]) {
                 savedstring = strdup(last);
             }
         }
-
     
     }
+    printf("\n");
 }
