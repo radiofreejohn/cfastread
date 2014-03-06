@@ -9,3 +9,12 @@ cfastread filename
 or
 
 cat filename | cfastread
+
+#### What's Spritz?
+Read more about it here: http://learn2spritz.com/
+
+#### Cool JavaScript library
+Spritzer: https://github.com/luisivan/spritzer
+
+#### Cool Bookmarklet
+OpenSpritz: https://gun.io/blog/openspritz-a-free-speed-reading-bookmarklet/
