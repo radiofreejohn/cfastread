@@ -1,9 +1,9 @@
 a command line utility to print out text with a method resembling the Spritz method.
 
-## Compile:
+#### Compile:
 make cfastread
 
-## Run:
+#### Run:
 cfastread filename
 
 or
