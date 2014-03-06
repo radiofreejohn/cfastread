@@ -11,7 +11,8 @@
 // too bad.
 #define OFFSET 20
 #define BUF_SIZE 1024
-
+#define COLOR "\x1b[31;1m"
+#define RESETCOLOR "\x1b[0m"
 
 // number of spaces to prepend to string on output
 int spaces(int stringsize, int offset) {
@@ -34,6 +35,17 @@ int buffer_spans(char *buffer, size_t size, char *delims) {
         }
     }
     return 1; 
+}
+
+void printstring(char *string) {
+    int n_spaces;
+    int middle = (strlen(string)/2);
+
+    n_spaces = spaces(strlen(string), OFFSET);
+    printf("%*s", n_spaces,"");
+    printf("%.*s", middle, string);
+    printf(COLOR "%.*s", 1, string+middle);
+    printf(RESETCOLOR "%s", string+middle+1);
 }
     
 
@@ -92,8 +104,9 @@ int main(int argc, char *argv[]) {
             if (save_last == 1) {
                 last = p;
             }
-            n_spaces = spaces(strlen(p), OFFSET);
-            printf("%*s%s", n_spaces,"", p);
+            // n_spaces = spaces(strlen(p), OFFSET);
+            // printf("%*s%s", n_spaces,"", p);
+            printstring(p);
             usleep((60.0/WPM) * 1000 * 1000);
         } while ((p = strtok(NULL, delims)));
 
