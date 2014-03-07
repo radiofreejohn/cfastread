@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,7 +52,7 @@ void printstring(char *string) {
 
 int main(int argc, char *argv[]) {
     struct stat st_buf;
-    int status, save_last, n_spaces;
+    int status, save_last, n_spaces, has_punct;
 
     FILE *f;
     char *delims = ";\n \"";
@@ -83,6 +84,12 @@ int main(int argc, char *argv[]) {
         save_last = buffer_spans(buffer, BUF_SIZE, delims);
 
         p=strtok(buffer, delims);
+        // fgets keeps newlines, but the tokenizer splits them
+        // so p can be NULL if fgets only has a newline.
+        if (p == NULL) {
+            usleep(4*(60.0/WPM) * 1000 * 1000);
+            continue;
+        }
         if (savedstring && (savedstring != NULL)) { 
             if (frankenstring && (frankenstring != NULL)) {
                 free(frankenstring);
@@ -96,15 +103,20 @@ int main(int argc, char *argv[]) {
         }
 
         do {
-            // I actually don't know why these don't work if both are
-            // puts or printf or they are swapped... shrug.
-            printf("\x1b[0K");
-            puts("\x1b[1A");
             if (save_last == 1) {
                 last = p;
             }
             printstring(p);
-            usleep((60.0/WPM) * 1000 * 1000);
+
+            // I actually don't know why these don't work if both are
+            // puts or printf or they are swapped... shrug.
+            printf("\x1b[0K");
+            puts("\x1b[1A");
+
+            // delay twice as long for punctuation
+            has_punct = (ispunct(p[strlen(p)-1]) == 0) ? 1 : 7;
+            usleep(has_punct*(60.0/WPM) * 1000 * 1000);
+
         } while ((p = strtok(NULL, delims)));
 
         // clean up
