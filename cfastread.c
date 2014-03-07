@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
             puts("\x1b[1A");
 
             // delay twice as long for punctuation
-            has_punct = (ispunct(p[strlen(p)-1]) == 0) ? 1 : 7;
+            has_punct = (ispunct(p[strlen(p)-1]) == 0) ? 1 : 2;
             usleep(has_punct*(60.0/WPM) * 1000 * 1000);
 
         } while ((p = strtok(NULL, delims)));
