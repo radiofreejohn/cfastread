@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define WPM 300
+#define WPM 400
 // should be 1/2 the size of the longest string
 // don't want to read in the whole thing first.
 // if the string is longer than 2x the offset, 
@@ -79,11 +79,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    //printf("\n");
     while(fgets(buffer, BUF_SIZE, f) != NULL) {
         save_last = buffer_spans(buffer, BUF_SIZE, delims);
 
-        p=strtok(buffer, ";\n \"");
+        p=strtok(buffer, delims);
         if (savedstring && (savedstring != NULL)) { 
             if (frankenstring && (frankenstring != NULL)) {
                 free(frankenstring);
