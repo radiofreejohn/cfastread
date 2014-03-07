@@ -11,8 +11,10 @@
 // if the string is longer than 2x the offset, 
 // too bad.
 #define OFFSET 20
-#define BUF_SIZE 1024
-#define COLOR "\x1b[31;1m"
+#define BUFSIZE 1024
+#define COLOR "\x1b[0m"
+// "\x1b[37;1m"
+#define CENTERCOLOR "\x1b[31;1m"
 #define RESETCOLOR "\x1b[0m"
 
 // number of spaces to prepend to string on output
@@ -44,9 +46,9 @@ void printstring(char *string) {
 
     n_spaces = spaces(strlen(string), OFFSET);
     printf("%*s", n_spaces,"");
-    printf("%.*s", middle, string);
-    printf(COLOR "%.*s", 1, string+middle);
-    printf(RESETCOLOR "%s", string+middle+1);
+    printf(COLOR "%.*s", middle, string);
+    printf(CENTERCOLOR "%.*s", 1, string+middle);
+    printf(COLOR "%s" RESETCOLOR, string+middle+1);
 }
     
 
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]) {
 
     FILE *f;
     char *delims = ";\n \"";
-    char buffer[BUF_SIZE],*p;
+    char buffer[BUFSIZE],*p;
     // for strings that span the buffer boundary
     char *savedstring = NULL;
     char *frankenstring = NULL;
@@ -80,8 +82,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    while(fgets(buffer, BUF_SIZE, f) != NULL) {
-        save_last = buffer_spans(buffer, BUF_SIZE, delims);
+    while(fgets(buffer, BUFSIZE, f) != NULL) {
+        save_last = buffer_spans(buffer, BUFSIZE, delims);
 
         p=strtok(buffer, delims);
         // fgets keeps newlines, but the tokenizer splits them
