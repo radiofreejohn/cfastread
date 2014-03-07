@@ -1,4 +1,5 @@
 a command line utility to print out text with a method resembling the Spritz method.
+![Example](https://github.com/radiofreejohn/cfastread/blob/master/terminal.gif?raw=true)
 
 #### Compile:
 make cfastread
