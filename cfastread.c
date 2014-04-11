@@ -54,7 +54,7 @@ void printstring(char *string) {
 
 int main(int argc, char *argv[]) {
     struct stat st_buf;
-    int status, save_last, n_spaces, has_punct;
+    int status, save_last, has_punct;
 
     FILE *f;
     char *delims = ";\n \"";
@@ -132,5 +132,6 @@ int main(int argc, char *argv[]) {
         }
     
     }
+    fclose(f);
     printf("\n");
 }
