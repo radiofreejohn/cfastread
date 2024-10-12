@@ -12,7 +12,7 @@ or
 cat filename | cfastread
 
 #### What's Spritz?
-Read more about it here: http://learn2spritz.com/
+Read more about it ~here: http://learn2spritz.com/~ it's dead.
 
 #### Cool JavaScript library
 Spritzer: https://github.com/luisivan/spritzer
