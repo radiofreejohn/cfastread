@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     }
 
     while(fgets(buffer, BUFSIZE, f) != NULL) {
-        save_last = buffer_spans(buffer, BUFSIZE, delims);
+        save_last = buffer_spans(buffer, strlen(buffer), delims);
 
         p=strtok(buffer, delims);
         // fgets keeps newlines, but the tokenizer splits them
@@ -99,6 +99,7 @@ int main(int argc, char *argv[]) {
             }
 
             frankenstring = malloc(sizeof(char) * (strlen(p)+strlen(savedstring)) + 1);
+            frankenstring[0] = '\0';
             strncat(frankenstring, savedstring, strlen(savedstring));
             strncat(frankenstring, p, strlen(p));
             p = frankenstring;
@@ -123,12 +124,10 @@ int main(int argc, char *argv[]) {
 
         // clean up
         if (save_last == 1) {
-            if (savedstring && (savedstring != NULL)) {
+            if (savedstring != NULL) {
                 free(savedstring);
-                savedstring = NULL;
-            } else {
-                savedstring = strdup(last);
             }
+            savedstring = strdup(last);
         }
     
     }
