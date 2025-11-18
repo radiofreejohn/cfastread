@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,70 @@
 #define BUFSIZE 1024
 #define COLOR "\x1b[0m"
 // "\x1b[37;1m"
-#define CENTERCOLOR "\x1b[31;1m"
+#define DEFAULT_CENTERCOLOR "\x1b[31;1m"
 #define RESETCOLOR "\x1b[0m"
+
+// Color options for -c flag
+typedef struct {
+    const char *name;
+    const char *code;
+} ColorOption;
+
+static const ColorOption colors[] = {
+    {"red",     "\x1b[31;1m"},   // default - bright red
+    {"green",   "\x1b[32;1m"},   // bright green
+    {"yellow",  "\x1b[33;1m"},   // bright yellow
+    {"blue",    "\x1b[34;1m"},   // bright blue
+    {"magenta", "\x1b[35;1m"},   // bright magenta
+    {"cyan",    "\x1b[36;1m"},   // bright cyan
+    {"white",   "\x1b[37;1m"},   // bright white
+    {"orange",  "\x1b[38;5;208m"}, // 256-color orange (good visibility)
+    {NULL, NULL}
+};
+
+// Global for selected center color
+static const char *centercolor = DEFAULT_CENTERCOLOR;
+
+// Look up color by name, returns NULL if not found
+const char *get_color_code(const char *name) {
+    for (int i = 0; colors[i].name != NULL; i++) {
+        if (strcasecmp(colors[i].name, name) == 0) {
+            return colors[i].code;
+        }
+    }
+    return NULL;
+}
+
+// Print available colors
+void print_colors() {
+    fprintf(stderr, "Available colors: ");
+    for (int i = 0; colors[i].name != NULL; i++) {
+        fprintf(stderr, "%s%s", colors[i].name,
+                colors[i+1].name ? ", " : "\n");
+    }
+}
+
+// Print help message and exit
+void print_help(const char *progname) {
+    printf("Usage: %s [-c color] [file]\n\n", progname);
+    printf("A speed reading tool that displays words one at a time with the\n");
+    printf("center character highlighted to help focus your eyes.\n\n");
+    printf("Options:\n");
+    printf("  -c, --color <name>  Set the highlight color for the center character\n");
+    printf("  -h, --help          Show this help message and exit\n\n");
+    printf("Available colors:\n");
+    printf("  red      Bright red (default)\n");
+    printf("  green    Bright green\n");
+    printf("  yellow   Bright yellow\n");
+    printf("  blue     Bright blue\n");
+    printf("  magenta  Bright magenta\n");
+    printf("  cyan     Bright cyan\n");
+    printf("  white    Bright white\n");
+    printf("  orange   Orange (256-color mode)\n\n");
+    printf("If no file is specified, reads from stdin.\n");
+    printf("Color names are case-insensitive.\n");
+    exit(0);
+}
 
 // number of spaces to prepend to string on output
 int spaces(int stringsize, int offset) {
@@ -47,7 +110,7 @@ void printstring(char *string) {
     n_spaces = spaces(strlen(string), OFFSET);
     printf("%*s", n_spaces,"");
     printf(COLOR "%.*s", middle, string);
-    printf(CENTERCOLOR "%.*s", 1, string+middle);
+    printf("%s%.*s", centercolor, 1, string+middle);
     printf(COLOR "%s" RESETCOLOR, string+middle+1);
 }
     
@@ -55,6 +118,8 @@ void printstring(char *string) {
 int main(int argc, char *argv[]) {
     struct stat st_buf;
     int status, save_last, has_punct;
+    int opt;
+    char *filename = NULL;
 
     FILE *f;
     char *delims = ";\n \"";
@@ -64,21 +129,56 @@ int main(int argc, char *argv[]) {
     char *frankenstring = NULL;
     char *last;
 
+    // long options
+    static struct option long_options[] = {
+        {"color", required_argument, 0, 'c'},
+        {"help",  no_argument,       0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    // parse options
+    while ((opt = getopt_long(argc, argv, "c:h", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 'c': {
+                const char *code = get_color_code(optarg);
+                if (code == NULL) {
+                    fprintf(stderr, "Unknown color: %s\n", optarg);
+                    print_colors();
+                    exit(1);
+                }
+                centercolor = code;
+                break;
+            }
+            case 'h':
+                print_help(argv[0]);
+                break;
+            default:
+                fprintf(stderr, "Usage: %s [-c color] [file]\n", argv[0]);
+                print_colors();
+                exit(1);
+        }
+    }
+
+    // remaining argument is the file
+    if (optind < argc) {
+        filename = argv[optind];
+    }
+
     // check file
-    if (argc == 2) {
-        status = stat(argv[1], &st_buf);
+    if (filename != NULL) {
+        status = stat(filename, &st_buf);
         if (status != 0 || (!S_ISREG(st_buf.st_mode))) {
-            fprintf(stderr, "Error or file not found: %s\n", argv[1]);
+            fprintf(stderr, "Error or file not found: %s\n", filename);
             return 1;
         }
-        f = fopen(argv[1], "r");
+        f = fopen(filename, "r");
     } else {
         f = stdin;
     }
 
         // open the file
     if (f == NULL) {
-        fprintf(stderr, "Error opening file: %s\n", argv[1]);
+        fprintf(stderr, "Error opening file: %s\n", filename);
         return 1;
     }
 
